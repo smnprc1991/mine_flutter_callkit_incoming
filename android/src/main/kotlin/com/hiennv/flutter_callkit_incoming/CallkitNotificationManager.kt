@@ -29,6 +29,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
 import com.hiennv.flutter_callkit_incoming.widgets.CircleTransform
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
@@ -168,6 +169,145 @@ class CallkitNotificationManager(private val context: Context) {
             }
 
             notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            notificationBuilder.setCustomContentView(notificationSmallViews)
+            notificationBuilder.setCustomBigContentView(notificationViews)
+            notificationBuilder.setCustomHeadsUpContentView(notificationSmallViews)
+        } else {
+            val avatarUrl = data.getString(CallkitConstants.EXTRA_CALLKIT_AVATAR, "")
+            if (avatarUrl != null && avatarUrl.isNotEmpty()) {
+                val headers =
+                    data.getSerializable(CallkitConstants.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+                getPicassoInstance(context, headers).load(avatarUrl)
+                    .into(targetLoadAvatarDefault)
+            }
+            notificationBuilder.setContentTitle(
+                data.getString(
+                    CallkitConstants.EXTRA_CALLKIT_NAME_CALLER,
+                    ""
+                )
+            )
+            notificationBuilder.setContentText(
+                data.getString(
+                    CallkitConstants.EXTRA_CALLKIT_HANDLE,
+                    ""
+                )
+            )
+            val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+            val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                R.drawable.ic_decline,
+                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
+                getDeclinePendingIntent(notificationId, data)
+            ).build()
+            notificationBuilder.addAction(declineAction)
+            val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
+            val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+                R.drawable.ic_accept,
+                if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                getAcceptPendingIntent(notificationId, data)
+            ).build()
+            notificationBuilder.addAction(acceptAction)
+        }
+        val notification = notificationBuilder.build()
+        notification.flags = Notification.FLAG_INSISTENT
+        getNotificationManager().notify(notificationId, notification)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun showOngoingCallNotification(data: Bundle) {
+        data.putLong(EXTRA_TIME_START_CALL, System.currentTimeMillis())
+
+        notificationId =
+            data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
+        createNotificationChanel(
+            data.getString(
+                CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
+                "Incoming Call"
+            ),
+            data.getString(
+                CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
+                "Missed Call"
+            ),
+        )
+
+        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
+        notificationBuilder.setAutoCancel(false)
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
+        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(NotificationCompat.CATEGORY_CALL)
+            notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
+        }
+        notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        notificationBuilder.setOngoing(true)
+        notificationBuilder.setWhen(0)
+      notificationBuilder.setTimeoutAfter(
+            data.getLong(
+                CallkitConstants.EXTRA_CALLKIT_DURATION,
+                0L
+            )
+        )
+        notificationBuilder.setOnlyAlertOnce(true)
+        notificationBuilder.setSound(null)
+        notificationBuilder.setFullScreenIntent(
+            getActivityPendingIntent(notificationId, data), true
+        )
+        notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
+        notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
+        val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
+        var smallIcon = context.applicationInfo.icon
+        if (typeCall > 0) {
+            smallIcon = R.drawable.ic_video
+        } else {
+            if (smallIcon >= 0) {
+                smallIcon = R.drawable.ic_accept
+            }
+        }
+        notificationBuilder.setSmallIcon(smallIcon)
+        val actionColor = data.getString(CallkitConstants.EXTRA_CALLKIT_ACTION_COLOR, "#4CAF50")
+        try {
+            notificationBuilder.color = Color.parseColor(actionColor)
+        } catch (_: Exception) {
+        }
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
+        notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
+        val isCustomNotification =
+            data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION, false)
+        val isCustomSmallExNotification =
+            data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION, false)
+        if (isCustomNotification) {
+            notificationViews =
+                RemoteViews(context.packageName, R.layout.layout_custom_notification)
+            initNotificationViews(notificationViews!!, data)
+
+            if ((Build.MANUFACTURER.equals(
+                    "Samsung",
+                    ignoreCase = true
+                ) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) || isCustomSmallExNotification
+            ) {
+                notificationSmallViews =
+                    RemoteViews(context.packageName, R.layout.layout_custom_small_ex_notification)
+                initNotificationViews(notificationSmallViews!!, data)
+            } else {
+                notificationSmallViews =
+                    RemoteViews(context.packageName, R.layout.layout_custom_small_notification)
+                initNotificationViews(notificationSmallViews!!, data)
+            }
+
+
+            Person.Builder().setName("Ciccio").build()
+
+
+
+
+
+            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            notificationBuilder.setStyle(NotificationCompat.CallStyle.forOngoingCall(
+
+                Person.Builder().setName("Ciccio").build(),
+
+                getDeclinePendingIntent(notificationId, data)
+            )
+            )
             notificationBuilder.setCustomContentView(notificationSmallViews)
             notificationBuilder.setCustomBigContentView(notificationViews)
             notificationBuilder.setCustomHeadsUpContentView(notificationSmallViews)
