@@ -49,6 +49,10 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("showMissCallNotification", params.toJson());
   }
 
+  static Future showCallkitOngoing(CallKitParams params) async {
+    await _channel.invokeMethod("showCallkitOngoing", params.toJson());
+  }
+
   /// Hide notification call for Android.
   /// Only Android
   static Future hideCallkitIncoming(CallKitParams params) async {

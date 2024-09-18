@@ -174,6 +174,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     result.success("OK")
                 }
 
+                   "showCallkitOngoing" -> {
+                    val data = Data(call.arguments() ?: HashMap())
+                    data.from = "notification"
+                    callkitNotificationManager?.showOngoingCallNotification(data.toBundle())
+                    result.success("OK")
+                }
+
                 "startCall" -> {
                     val data = Data(call.arguments() ?: HashMap())
                     context?.sendBroadcast(

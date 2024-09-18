@@ -129,7 +129,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> makeFakeCallInComing() async {
-    await Future.delayed(const Duration(seconds: 10), () async {
+    await Future.delayed(const Duration(seconds: 0), () async {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
@@ -139,7 +139,7 @@ class HomePageState extends State<HomePage> {
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
         type: 0,
-        duration: 30000,
+        duration: 0,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
@@ -183,8 +183,57 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> endCurrentCall() async {
-    initCurrentCall();
-    await FlutterCallkitIncoming.endCall(_currentUuid!);
+     await Future.delayed(const Duration(seconds: 0), () async {
+      _currentUuid = _uuid.v4();
+
+      final params = CallKitParams(
+        id: _currentUuid,
+        nameCaller: 'Hien Nguyen',
+        appName: 'Callkit',
+        avatar: 'https://i.pravatar.cc/100',
+        handle: '0123456789',
+        type: 0,
+        duration: 0,
+        textAccept: 'Accept',
+        textDecline: 'Decline',
+        missedCallNotification: const NotificationParams(
+          showNotification: true,
+          isShowCallback: true,
+          subtitle: 'Missed call',
+          callbackText: 'Call back',
+        ),
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+        android: const AndroidParams(
+          isCustomNotification: true,
+          isShowLogo: false,
+          ringtonePath: 'system_ringtone_default',
+          backgroundColor: '#0955fa',
+          backgroundUrl: 'assets/test.png',
+          actionColor: '#4CAF50',
+          textColor: '#ffffff',
+          incomingCallNotificationChannelName: 'Incoming Call',
+          missedCallNotificationChannelName: 'Missed Call',
+        ),
+        ios: const IOSParams(
+          iconName: 'CallKitLogo',
+          handleType: '',
+          supportsVideo: true,
+          maximumCallGroups: 2,
+          maximumCallsPerCallGroup: 1,
+          audioSessionMode: 'default',
+          audioSessionActive: true,
+          audioSessionPreferredSampleRate: 44100.0,
+          audioSessionPreferredIOBufferDuration: 0.005,
+          supportsDTMF: true,
+          supportsHolding: true,
+          supportsGrouping: false,
+          supportsUngrouping: false,
+          ringtonePath: 'system_ringtone_default',
+        ),
+      );
+      await FlutterCallkitIncoming.showCallkitOngoing(params);
+    });
   }
 
   Future<void> startOutGoingCall() async {
