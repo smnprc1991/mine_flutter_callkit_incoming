@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/android_params.dart';
@@ -134,17 +135,17 @@ class HomePageState extends State<HomePage> {
 
       final params = CallKitParams(
         id: _currentUuid,
-        nameCaller: 'Hien Nguyen',
+        nameCaller: 'Simone Porcu',
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
         type: 0,
-        duration: 0,
+        duration: 3000,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
-          showNotification: true,
-          isShowCallback: true,
+          showNotification: false,
+          isShowCallback: false,
           subtitle: 'Missed call',
           callbackText: 'Call back',
         ),
@@ -183,7 +184,9 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> endCurrentCall() async {
-     await Future.delayed(const Duration(seconds: 0), () async {
+
+    inspect('calling');
+    await Future.delayed(const Duration(seconds: 0), () async {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
@@ -197,8 +200,8 @@ class HomePageState extends State<HomePage> {
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
-          showNotification: true,
-          isShowCallback: true,
+          showNotification: false,
+          isShowCallback: false,
           subtitle: 'Missed call',
           callbackText: 'Call back',
         ),
@@ -268,6 +271,7 @@ class HomePageState extends State<HomePage> {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         print('HOME: $event');
+
         switch (event!.event) {
           case Event.actionCallIncoming:
             // TODO: received an incoming call
@@ -279,15 +283,21 @@ class HomePageState extends State<HomePage> {
           case Event.actionCallAccept:
             // TODO: accepted an incoming call
             // TODO: show screen calling in Flutter
+            inspect("call aacepted");
             NavigationService.instance
                 .pushNamedIfNotCurrent(AppRoute.callingPage, args: event.body);
+
+            endCurrentCall();
+
             break;
           case Event.actionCallDecline:
             // TODO: declined an incoming call
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
+            inspect("chiamata declinata");
             break;
           case Event.actionCallEnded:
             // TODO: ended an incoming/outgoing call
+            inspect("chiamata chiusa");
             break;
           case Event.actionCallTimeout:
             // TODO: missed an incoming call

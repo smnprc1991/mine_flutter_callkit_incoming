@@ -58,6 +58,8 @@ data class Data(val args: Map<String, Any?>) {
     var actionColor: String
     @JsonProperty("incomingCallNotificationChannelName")
     var incomingCallNotificationChannelName: String? = null
+    @JsonProperty("ongoingCallNotificationChannelName")
+    var ongoingCallNotificationChannelName: String? = null
     @JsonProperty("missedCallNotificationChannelName")
     var missedCallNotificationChannelName: String? = null
     @JsonProperty("missedNotificationId")
@@ -99,6 +101,8 @@ data class Data(val args: Map<String, Any?>) {
         textColor = android["textColor"] as? String ?: "#ffffff"
         incomingCallNotificationChannelName =
             android["incomingCallNotificationChannelName"] as? String
+        ongoingCallNotificationChannelName =
+            android["ongoingCallNotificationChannelName"] as? String
         missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
         isShowFullLockedScreen = android["isShowFullLockedScreen"] as? Boolean ?: true
 
@@ -207,6 +211,10 @@ data class Data(val args: Map<String, Any?>) {
             incomingCallNotificationChannelName
         )
         bundle.putString(
+            CallkitConstants.EXTRA_CALLKIT_ONGOING_CALL_NOTIFICATION_CHANNEL_NAME,
+            ongoingCallNotificationChannelName
+        )
+        bundle.putString(
             CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
             missedCallNotificationChannelName
         )
@@ -295,6 +303,9 @@ data class Data(val args: Map<String, Any?>) {
 
             data.incomingCallNotificationChannelName = bundle.getString(
                 CallkitConstants.EXTRA_CALLKIT_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME
+            )
+            data.ongoingCallNotificationChannelName = bundle.getString(
+                CallkitConstants.EXTRA_CALLKIT_ONGOING_CALL_NOTIFICATION_CHANNEL_NAME
             )
             data.missedCallNotificationChannelName = bundle.getString(
                 CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_NOTIFICATION_CHANNEL_NAME
