@@ -255,7 +255,7 @@ class CallkitNotificationManager(private val context: Context) {
         notificationBuilder.setFullScreenIntent(
             getActivityPendingIntent(notificationId, data), true
         )
-        notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
+        notificationBuilder.setContentIntent(getOngoingActivityIntent(notificationId, data))
         notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val typeCall = data.getInt(CallkitConstants.EXTRA_CALLKIT_TYPE, -1)
         var smallIcon = context.applicationInfo.icon
@@ -662,6 +662,11 @@ class CallkitNotificationManager(private val context: Context) {
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
+
+    private fun getOngoingActivityIntent(id: Int, data: Bundle): PendingIntent {
+        val intent = TransparentActivity.getIntent(context, CallkitConstants.ACTION_CALL_CALLBACK ,data)
+        return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
+    }
     private fun getAppPendingIntent(id: Int, data: Bundle): PendingIntent {
         val intent: Intent? = AppUtils.getAppIntent(context, data = data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
