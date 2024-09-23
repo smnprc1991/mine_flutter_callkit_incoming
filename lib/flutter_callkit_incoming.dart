@@ -53,6 +53,10 @@ class FlutterCallkitIncoming {
     await _channel.invokeMethod("showCallkitOngoing", params.toJson());
   }
 
+   static Future clearAllCalls(CallKitParams params) async {
+    await _channel.invokeMethod("clearNotification", params.toJson());
+  }
+
   /// Hide notification call for Android.
   /// Only Android
   static Future hideCallkitIncoming(CallKitParams params) async {

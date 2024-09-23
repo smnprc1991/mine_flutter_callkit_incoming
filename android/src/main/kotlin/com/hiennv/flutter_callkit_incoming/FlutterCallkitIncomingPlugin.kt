@@ -101,7 +101,17 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 )
         )
     }
-
+    public fun cancelAllNotification(data: Data) {
+        data.from = "notification"
+        callkitNotificationManager?.clearIncomingNotification(data.toBundle(),isAccepted = true)
+        //send BroadcastReceiver
+        context?.sendBroadcast(
+                CallkitIncomingBroadcastReceiver.getIntentIncoming(
+                        requireNotNull(context),
+                        data.toBundle()
+                )
+        )
+    }
     public fun showMissCallNotification(data: Data) {
         callkitNotificationManager?.showIncomingNotification(data.toBundle())
     }
@@ -180,6 +190,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     callkitNotificationManager?.showOngoingCallNotification(data.toBundle())
                     result.success("OK")
                 }
+                "clearNotification" -> {
+                    val data = Data(call.arguments() ?: HashMap())
+                    data.from = "notification"
+                    callkitNotificationManager?.clearIncomingNotification(data.toBundle(),isAccepted = false)
+                    result.success("OK")
+                }
+
 
                 "startCall" -> {
                     val data = Data(call.arguments() ?: HashMap())

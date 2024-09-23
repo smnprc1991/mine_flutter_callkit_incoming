@@ -134,13 +134,13 @@ class HomePageState extends State<HomePage> {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
-        id: _currentUuid,
+        id: 'ciao',
         nameCaller: 'Simone Porcu',
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
         type: 0,
-        duration: 3000,
+        duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
@@ -184,19 +184,18 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> endCurrentCall() async {
-
-    inspect('calling');
+  
     await Future.delayed(const Duration(seconds: 0), () async {
       _currentUuid = _uuid.v4();
 
       final params = CallKitParams(
-        id: _currentUuid,
-        nameCaller: 'Hien Nguyen',
+        id: 'ciao',
+        nameCaller: 'Simone Porcu',
         appName: 'Callkit',
         avatar: 'https://i.pravatar.cc/100',
         handle: '0123456789',
         type: 0,
-        duration: 0,
+        duration: 30000,
         textAccept: 'Accept',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
@@ -235,7 +234,7 @@ class HomePageState extends State<HomePage> {
           ringtonePath: 'system_ringtone_default',
         ),
       );
-      await FlutterCallkitIncoming.showCallkitOngoing(params);
+      FlutterCallkitIncoming.endCall('ciao');
     });
   }
 
@@ -258,7 +257,55 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> endAllCalls() async {
-    await FlutterCallkitIncoming.endAllCalls();
+    _currentUuid = _uuid.v4();
+
+    final params = CallKitParams(
+      id: _currentUuid,
+      nameCaller: 'Hien Nguyen',
+      appName: 'Callkit',
+      avatar: 'https://i.pravatar.cc/100',
+      handle: '0123456789',
+      type: 0,
+      duration: 0,
+      textAccept: 'Accept',
+      textDecline: 'Decline',
+      missedCallNotification: const NotificationParams(
+        showNotification: false,
+        isShowCallback: false,
+        subtitle: 'Missed call',
+        callbackText: 'Call back',
+      ),
+      extra: <String, dynamic>{'userId': '1a2b3c4d'},
+      headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+      android: const AndroidParams(
+        isCustomNotification: true,
+        isShowLogo: false,
+        ringtonePath: 'system_ringtone_default',
+        backgroundColor: '#0955fa',
+        backgroundUrl: 'assets/test.png',
+        actionColor: '#4CAF50',
+        textColor: '#ffffff',
+        incomingCallNotificationChannelName: 'Incoming Call',
+        missedCallNotificationChannelName: 'Missed Call',
+      ),
+      ios: const IOSParams(
+        iconName: 'CallKitLogo',
+        handleType: '',
+        supportsVideo: true,
+        maximumCallGroups: 2,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'default',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        supportsDTMF: true,
+        supportsHolding: true,
+        supportsGrouping: false,
+        supportsUngrouping: false,
+        ringtonePath: 'system_ringtone_default',
+      ),
+    );
+    await FlutterCallkitIncoming.showCallkitIncoming(params);
   }
 
   Future<void> getDevicePushTokenVoIP() async {
@@ -291,12 +338,11 @@ class HomePageState extends State<HomePage> {
 
             break;
           case Event.actionCallDecline:
-            // TODO: declined an incoming call
             await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
             inspect("chiamata declinata");
+            FlutterCallkitIncoming.endAllCalls();
             break;
           case Event.actionCallEnded:
-            // TODO: ended an incoming/outgoing call
             inspect("chiamata chiusa");
             break;
           case Event.actionCallTimeout:
